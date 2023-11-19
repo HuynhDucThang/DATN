@@ -10,7 +10,7 @@ const app = express();
 dotenv.config();
 
 // dùng helmet để bảo vệ thông tin
-
+app.use(express.static('app/public'))
 // middleware
 app.use(
   express.urlencoded({

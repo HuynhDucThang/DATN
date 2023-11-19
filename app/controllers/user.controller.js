@@ -66,7 +66,7 @@ export const chekcOtp = catchAsync(async (req, res, next) => {
     });
   }
 
-  res.status(200).json({
+  return res.status(200).json({
     is_verify: user.is_verify,
     message: "otp verified",
   });
@@ -77,8 +77,23 @@ export const checkPhoneNumber = catchAsync(async (req, res, next) => {
     phone_number: req.query.phone_number,
   });
 
-  res.status(200).json({
+  return res.status(200).json({
     success: true,
     checkPhoneNumber: checkPhoneNumber ? true : false,
+  });
+});
+
+export const getCurrentUser = catchAsync(async (req, res, next) => {
+  const foundUser = await UserModel.findOne({
+    _id: req.userId.id,
+  });
+
+  if (!foundUser) {
+    return next(new ErrorHandler("Không tìm thấy người dùng", 404));
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: foundUser,
   });
 });

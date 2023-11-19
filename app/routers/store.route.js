@@ -1,27 +1,36 @@
 import express from "express";
 import {
   createStores,
-  getStore,
+  getStoreById,
   getStores,
+  getImageStore,
+  uploadImagesStore,
 } from "../controllers/store.controller.js";
+
+import multer from "multer";
+import { createDirectoryIfNotExists } from "../utils/common.js";
 
 const router = express.Router();
 
-import multer from "multer";
-
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    console.log("file : ", req.body.owner);
-    cb(null, "./app/public/stores");
+  destination: function (req, file, cb) {
+    const directory = `./app/public/stores/${req.params.storeId}`;
+    createDirectoryIfNotExists(directory);
+    cb(null, directory);
   },
-  filename: (req, file, cb) => {
+  filename: function (req, file, cb) {
     cb(null, `${file.originalname}`);
   },
 });
 
 const upload = multer({ storage: storage });
+
 router.post("/", upload.array("images", 10), createStores);
-router.get("/:storeId", getStore);
+router.post("/upload/:storeId", upload.array("images", 10), uploadImagesStore);
+
+router.get("/:storeId", getStoreById);
 router.get("/", getStores);
+// Endpoint để lấy và hiển thị ảnh
+router.get("/image/:storeId/:imageName", getImageStore);
 
 export default router;
