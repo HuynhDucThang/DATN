@@ -3,7 +3,7 @@ import ErrorHandler from "../utils/errorHandle.js";
 import { catchAsync } from "../middlewares/catchAsyncError.js";
 import reviewModel from "../models/review.model.js";
 import path from "path";
-import fs from "fs"
+import fs from "fs";
 
 export const createStores = catchAsync(async (req, res, next) => {
   const body = req.body;
@@ -59,7 +59,7 @@ export const getStoreById = catchAsync(async (req, res, next) => {
 });
 
 export const getStores = catchAsync(async (req, res, next) => {
-  const stores = await StoreModel.find();
+  const stores = await StoreModel.find().populate('owner');
 
   res.status(200).json({
     message: "Tạo cửa hàng thành công",

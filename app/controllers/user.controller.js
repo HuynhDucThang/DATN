@@ -2,6 +2,8 @@ import UserModel from "../models/user.model.js";
 import ErrorHandler from "../utils/errorHandle.js";
 import { catchAsync } from "../middlewares/catchAsyncError.js";
 import { sendCookies } from "../utils/sendCookies.js";
+import path from "path";
+import fs from "fs";
 
 export const register = catchAsync(async (req, res, next) => {
   const body = req.body;
@@ -95,5 +97,37 @@ export const getCurrentUser = catchAsync(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     data: foundUser,
+  });
+});
+
+export const uploadAvatar = catchAsync(async (req, res, next) => {
+  const userId = req.params.userId;
+  const foundUser = await UserModel.findById(userId);
+
+  if (!foundUser) {
+    return next(new ErrorHandler("Không tìm thấy bài riviu", 404));
+  }
+  foundUser.avatar = `${req.file.filename}`;
+
+  await foundUser.save();
+
+  return res.status(200).json({
+    message: "Tải ảnh thành công",
+    // data: newStore,
+  });
+});
+
+export const getAvatar = catchAsync(async (req, res) => {
+  const userId = req.params.userId;
+
+  const imagePath = path.join("app", "public", "avatar", userId);
+  fs.readFile(imagePath, (err, data) => {
+    if (err) {
+      return res.status(500).send("Lỗi khi đọc ảnh.");
+    }
+
+    // Trả về ảnh dưới dạng binary
+    res.writeHead(200, { "Content-Type": "image/png" }); // Điều chỉnh kiểu ảnh tương ứng với loại ảnh bạn đang sử dụng
+    res.end(data, "binary");
   });
 });

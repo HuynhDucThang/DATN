@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const reviewSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   store: { type: mongoose.Schema.Types.ObjectId, ref: "Store" },
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   title: String,
   content: String,
   images: [String],
