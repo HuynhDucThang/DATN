@@ -26,7 +26,7 @@ export const getStoreById = catchAsync(async (req, res, next) => {
 
   const [foundStore, foundReviews] = await Promise.all([
     StoreModel.findById(storeId),
-    reviewModel.find({ store: storeId }),
+    reviewModel.find({ store: storeId }).populate("author store"),
   ]);
 
   if (!foundStore) {
@@ -59,7 +59,7 @@ export const getStoreById = catchAsync(async (req, res, next) => {
 });
 
 export const getStores = catchAsync(async (req, res, next) => {
-  const stores = await StoreModel.find().populate('owner');
+  const stores = await StoreModel.find().populate("owner");
 
   res.status(200).json({
     message: "Tạo cửa hàng thành công",
@@ -99,5 +99,43 @@ export const getImageStore = catchAsync(async (req, res, next) => {
     // Trả về ảnh dưới dạng binary
     res.writeHead(200, { "Content-Type": "image/png" }); // Điều chỉnh kiểu ảnh tương ứng với loại ảnh bạn đang sử dụng
     res.end(data, "binary");
+  });
+});
+
+export const getStoresByUser = catchAsync(async (req, res, next) => {
+  const userId = req.params.userId;
+  const stores = await StoreModel.find({
+    owner: userId,
+  });
+
+  res.status(200).json({
+    message: "Tạo cửa hàng thành công",
+    data: stores,
+  });
+});
+
+export const getTopStores = catchAsync(async (req, res, next) => {
+  const topStores = await reviewModel.aggregate([
+    {
+      $group: {
+        _id: "$store",
+        reviewCount: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { reviewCount: -1 },
+    },
+    {
+      $limit: 5,
+    },
+  ]);
+
+  const idsStore = topStores.map((store) => store._id);
+
+  const result = await StoreModel.find({ _id: { $in: idsStore } });
+
+  res.status(200).json({
+    message: "Lấy thông tin top cửa hàng thành công",
+    data: result,
   });
 });

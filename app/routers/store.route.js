@@ -5,6 +5,8 @@ import {
   getStores,
   getImageStore,
   uploadImagesStore,
+  getStoresByUser,
+  getTopStores,
 } from "../controllers/store.controller.js";
 
 import multer from "multer";
@@ -25,9 +27,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+router.get("/top", getTopStores);
 router.post("/", upload.array("images", 10), createStores);
 router.post("/upload/:storeId", upload.array("images", 10), uploadImagesStore);
-
+router.get("/:userId/me", getStoresByUser);
 router.get("/:storeId", getStoreById);
 router.get("/", getStores);
 // Endpoint để lấy và hiển thị ảnh

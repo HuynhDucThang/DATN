@@ -3,6 +3,8 @@ import ErrorHandler from "../utils/errorHandle.js";
 import { catchAsync } from "../middlewares/catchAsyncError.js";
 import path from "path";
 import fs from "fs";
+import userModel from "../models/user.model.js";
+import mongoose from "mongoose";
 
 export const createReview = catchAsync(async (req, res, next) => {
   const body = req.body;
@@ -76,5 +78,45 @@ export const getReviewDetail = catchAsync(async (req, res, next) => {
   res.status(200).json({
     message: "Lấy thông tin bài review thành công",
     data: foundReview,
+  });
+});
+
+export const getReviewByUser = catchAsync(async (req, res, next) => {
+  const foundReview = await ReviewModel.find({
+    author: req.params.userId,
+  }).populate({
+    path: "author",
+    model: "User",
+  });
+
+  res.status(200).json({
+    message: "Lấy thông tin bài review thành công",
+    data: foundReview,
+  });
+});
+
+export const getTopReviews = catchAsync(async (req, res, next) => {
+  const topUsers = await ReviewModel.aggregate([
+    {
+      $group: {
+        _id: "$author",
+        reviewCount: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { reviewCount: -1 },
+    },
+    {
+      $limit: 5,
+    },
+  ]);
+
+  const idsUser = topUsers.map((user) => user._id);
+
+  const result = await userModel.find({ _id: { $in: idsUser } });
+
+  res.status(200).json({
+    message: "Lấy user top review",
+    data: result,
   });
 });

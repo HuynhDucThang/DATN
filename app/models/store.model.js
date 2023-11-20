@@ -15,16 +15,3 @@ const storeSchema = new mongoose.Schema({
 });
 
 export default mongoose.model("Store", storeSchema);
-
-/*
-{
-
-    "name" : "Cửa hàng 1",
-    "slogan" :"hehehehe",
-    "banner" : "/banner/123",
-    "images" : ["/img1", "/img2"],
-    "cuisine_national" : "VietNam",
-    "owner" : "65564e0a41a3bb84afc5ec62"
-}
-
-*/

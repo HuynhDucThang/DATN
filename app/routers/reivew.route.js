@@ -2,8 +2,10 @@ import express from "express";
 import {
   createReview,
   getImageReview,
+  getReviewByUser,
   getReviewDetail,
   getReviewsByStore,
+  getTopReviews,
   uploadImagesReview,
 } from "../controllers/review.controller.js";
 import multer from "multer";
@@ -30,6 +32,8 @@ router.post(
   upload.array("images", 10),
   uploadImagesReview
 );
+router.get("/top/users", getTopReviews);
+router.get("/:userId/me", getReviewByUser);
 router.get("/:reviewId/detail", getReviewDetail);
 router.get("/:storeId", getReviewsByStore);
 router.get("/image/:reviewId/:imageName", getImageReview);

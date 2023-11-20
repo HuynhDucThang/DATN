@@ -85,11 +85,22 @@ export const checkPhoneNumber = catchAsync(async (req, res, next) => {
   });
 });
 
-export const getCurrentUser = catchAsync(async (req, res, next) => {
-  const foundUser = await UserModel.findOne({
-    _id: req.userId.id,
-  });
+export const getCurrentUserById = catchAsync(async (req, res, next) => {
+  const userId = req.params.userId;
+  const foundUser = await UserModel.findById(userId);
 
+  if (!foundUser) {
+    return next(new ErrorHandler("Không tìm thấy người dùng", 404));
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: foundUser,
+  });
+});
+
+export const getCurrentUser = catchAsync(async (req, res, next) => {
+  const foundUser = await UserModel.findById(req.userId.id);
   if (!foundUser) {
     return next(new ErrorHandler("Không tìm thấy người dùng", 404));
   }
@@ -113,7 +124,7 @@ export const uploadAvatar = catchAsync(async (req, res, next) => {
 
   return res.status(200).json({
     message: "Tải ảnh thành công",
-    // data: newStore,
+    data: `${req.file.filename}`,
   });
 });
 
