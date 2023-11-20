@@ -53,3 +53,28 @@ export const getImageReview = catchAsync(async (req, res) => {
     res.end(data, "binary");
   });
 });
+
+export const getReviewDetail = catchAsync(async (req, res, next) => {
+  const foundReview = await ReviewModel.findById(req.params.reviewId)
+    .populate({
+      path: "author",
+      model: "User",
+    })
+    .populate({
+      path: "store",
+      model: "Store",
+    })
+    .populate({
+      path: "comments",
+      options: { sort: { created_at: -1 } },
+      populate: {
+        path: "author",
+        model: "User",
+      },
+    });
+
+  res.status(200).json({
+    message: "Lấy thông tin bài review thành công",
+    data: foundReview,
+  });
+});

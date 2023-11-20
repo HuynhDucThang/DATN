@@ -2,6 +2,7 @@ import express from "express";
 import {
   createReview,
   getImageReview,
+  getReviewDetail,
   getReviewsByStore,
   uploadImagesReview,
 } from "../controllers/review.controller.js";
@@ -29,6 +30,7 @@ router.post(
   upload.array("images", 10),
   uploadImagesReview
 );
+router.get("/:reviewId/detail", getReviewDetail);
 router.get("/:storeId", getReviewsByStore);
 router.get("/image/:reviewId/:imageName", getImageReview);
 
