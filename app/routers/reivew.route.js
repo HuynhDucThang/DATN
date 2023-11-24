@@ -4,8 +4,10 @@ import {
   getImageReview,
   getReviewByUser,
   getReviewDetail,
+  getReviewsByNational,
   getReviewsByStore,
   getTopReviews,
+  likeReview,
   uploadImagesReview,
 } from "../controllers/review.controller.js";
 import multer from "multer";
@@ -32,6 +34,8 @@ router.post(
   upload.array("images", 10),
   uploadImagesReview
 );
+router.patch("/like/:reviewId/:userId", likeReview);
+router.get("/:national/post", getReviewsByNational);
 router.get("/top/users", getTopReviews);
 router.get("/:userId/me", getReviewByUser);
 router.get("/:reviewId/detail", getReviewDetail);

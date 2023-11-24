@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import userModel from "../models/user.model.js";
 import mongoose from "mongoose";
+import storeModel from "../models/store.model.js";
 
 export const createReview = catchAsync(async (req, res, next) => {
   const body = req.body;
@@ -118,5 +119,74 @@ export const getTopReviews = catchAsync(async (req, res, next) => {
   res.status(200).json({
     message: "Lấy user top review",
     data: result,
+  });
+});
+
+export const getReviewsByNational = catchAsync(async (req, res, next) => {
+  const national = req.params.national;
+  const rating = req.query.rating;
+
+  const stores = await storeModel.find({ cuisine_national: national });
+
+  // Lấy danh sách các ObjectId của các cửa hàng
+  const storeIds = stores.map((store) => store._id);
+
+  // Tìm các reviews có store là một trong những cửa hàng thuộc danh sách trên
+  const reviews = await ReviewModel.find({ store: { $in: storeIds } }).populate(
+    "author"
+  );
+
+  let filteredReviews = [...reviews];
+
+  if (rating) {
+    filteredReviews = reviews.filter((review) => {
+      const total_rating = Math.ceil(
+        (review.rating.serve +
+          review.rating.price +
+          review.rating.space +
+          review.rating.smell +
+          review.rating.food_safety) /
+          5
+      );
+
+      return total_rating === parseInt(rating);
+    });
+  }
+
+  res.status(200).json({
+    message: "Lấy user top review",
+    data: filteredReviews,
+  });
+});
+
+export const likeReview = catchAsync(async (req, res, next) => {
+  const reviewId = req.params.reviewId;
+  const userId = req.params.userId;
+
+  const review = await ReviewModel.findById(reviewId);
+
+  if (!review) {
+    return next(new ErrorHandler("Không tìm thấy bài riviu", 404));
+  }
+
+  const isFavorited = review.favourities.includes(userId);
+
+  if (isFavorited) {
+    await ReviewModel.findOneAndUpdate(
+      { _id: reviewId },
+      { $pull: { favourities: userId } },
+      { new: true }
+    );
+  } else {
+    await ReviewModel.findOneAndUpdate(
+      { _id: reviewId },
+      { $push: { favourities: userId } },
+      { new: true }
+    );
+  }
+
+  res.status(200).json({
+    message: "Thay đổi trạng thái thành công",
+    data: null,
   });
 });
