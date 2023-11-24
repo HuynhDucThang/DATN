@@ -1,6 +1,8 @@
 import express from "express";
 import {
   createReview,
+  deleteReview,
+  editReview,
   getImageReview,
   getReviewByUser,
   getReviewDetail,
@@ -36,10 +38,15 @@ router.post(
 );
 router.patch("/like/:reviewId/:userId", likeReview);
 router.get("/:national/post", getReviewsByNational);
+// router.get("/categories/food-national", getCategories);
+
 router.get("/top/users", getTopReviews);
 router.get("/:userId/me", getReviewByUser);
 router.get("/:reviewId/detail", getReviewDetail);
 router.get("/:storeId", getReviewsByStore);
 router.get("/image/:reviewId/:imageName", getImageReview);
+
+router.patch("/:reviewId", editReview);
+router.delete("/:reviewId", deleteReview);
 
 export default router;

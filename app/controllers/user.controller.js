@@ -4,6 +4,7 @@ import { catchAsync } from "../middlewares/catchAsyncError.js";
 import { sendCookies } from "../utils/sendCookies.js";
 import path from "path";
 import fs from "fs";
+import reviewModel from "../models/review.model.js";
 
 export const register = catchAsync(async (req, res, next) => {
   const body = req.body;
@@ -93,9 +94,11 @@ export const getCurrentUserById = catchAsync(async (req, res, next) => {
     return next(new ErrorHandler("Không tìm thấy người dùng", 404));
   }
 
+  const totalReviews = (await reviewModel.find({ author: userId })).length;
+
   return res.status(200).json({
     success: true,
-    data: foundUser,
+    data: { ...foundUser._doc, totalReviews },
   });
 });
 
@@ -105,9 +108,12 @@ export const getCurrentUser = catchAsync(async (req, res, next) => {
     return next(new ErrorHandler("Không tìm thấy người dùng", 404));
   }
 
+  const totalReviews = (await reviewModel.find({ author: req.userId.id }))
+    .length;
+
   return res.status(200).json({
     success: true,
-    data: foundUser,
+    data: { ...foundUser._doc, totalReviews },
   });
 });
 

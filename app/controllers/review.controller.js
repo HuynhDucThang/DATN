@@ -6,6 +6,7 @@ import fs from "fs";
 import userModel from "../models/user.model.js";
 import mongoose from "mongoose";
 import storeModel from "../models/store.model.js";
+import reviewModel from "../models/review.model.js";
 
 export const createReview = catchAsync(async (req, res, next) => {
   const body = req.body;
@@ -133,7 +134,7 @@ export const getReviewsByNational = catchAsync(async (req, res, next) => {
 
   // Tìm các reviews có store là một trong những cửa hàng thuộc danh sách trên
   const reviews = await ReviewModel.find({ store: { $in: storeIds } }).populate(
-    "author"
+    "author store"
   );
 
   let filteredReviews = [...reviews];
@@ -187,6 +188,46 @@ export const likeReview = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     message: "Thay đổi trạng thái thành công",
+    data: null,
+  });
+});
+
+
+
+export const editReview = catchAsync(async (req, res, next) => {
+  const reviewId = req.params.reviewId;
+
+  const review = await reviewModel.findById(reviewId);
+
+  if (!review) {
+    return next(new ErrorHandler("Không tìm thấy địa điểm này", 404));
+  }
+
+  const updateData = req.body;
+
+  Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+
+  const updatedStore = await review.updateOne(updateData);
+
+  res.status(200).json({
+    message: "Chỉnh sửa thành công",
+    data: updatedStore,
+  });
+});
+
+export const deleteReview = catchAsync(async (req, res, next) => {
+  const reviewId = req.params.reviewId;
+
+  const review = await reviewModel.findById(reviewId);
+
+  if (!review) {
+    return next(new ErrorHandler("Không tìm thấy địa điểm này", 404));
+  }
+
+  await review.deleteOne();
+
+  res.status(200).json({
+    message: "Xoá bài review thành công",
     data: null,
   });
 });

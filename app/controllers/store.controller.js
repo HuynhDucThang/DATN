@@ -59,10 +59,15 @@ export const getStoreById = catchAsync(async (req, res, next) => {
 });
 
 export const getStores = catchAsync(async (req, res, next) => {
-  const stores = await StoreModel.find().populate("owner");
+  const search = req.query.search;
+
+  // Nếu có tham số search, thêm điều kiện tìm kiếm theo tên
+  const query = search ? { name: { $regex: new RegExp(search, "i") } } : {};
+
+  const stores = await StoreModel.find(query).populate("owner");
 
   res.status(200).json({
-    message: "Tạo cửa hàng thành công",
+    message: "tìm kiếm cửa hàng thành công",
     data: stores,
   });
 });
@@ -137,5 +142,45 @@ export const getTopStores = catchAsync(async (req, res, next) => {
   res.status(200).json({
     message: "Lấy thông tin top cửa hàng thành công",
     data: result,
+  });
+});
+
+export const editStore = catchAsync(async (req, res, next) => {
+  const storeId = req.params.storeId;
+
+  const store = await StoreModel.findById(storeId);
+
+  if (!store) {
+    return next(new ErrorHandler("Không tìm thấy địa điểm này", 404));
+  }
+
+  const updateData = req.body;
+
+  Object.keys(updateData).forEach(
+    (key) => updateData[key] === undefined && delete updateData[key]
+  );
+
+  const updatedStore = await store.updateOne(updateData);
+
+  res.status(200).json({
+    message: "Chỉnh sửa thành công",
+    data: updatedStore,
+  });
+});
+
+export const deleteStore = catchAsync(async (req, res, next) => {
+  const storeId = req.params.storeId;
+
+  const store = await StoreModel.findById(storeId);
+
+  if (!store) {
+    return next(new ErrorHandler("Không tìm thấy địa điểm này", 404));
+  }
+
+  await store.deleteOne();
+
+  res.status(200).json({
+    message: "Xoá cửa hàng thành công",
+    data: null,
   });
 });

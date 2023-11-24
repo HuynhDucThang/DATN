@@ -7,6 +7,8 @@ import {
   uploadImagesStore,
   getStoresByUser,
   getTopStores,
+  deleteStore,
+  editStore,
 } from "../controllers/store.controller.js";
 
 import multer from "multer";
@@ -35,5 +37,9 @@ router.get("/:storeId", getStoreById);
 router.get("/", getStores);
 // Endpoint để lấy và hiển thị ảnh
 router.get("/image/:storeId/:imageName", getImageStore);
+
+router.patch("/:storeId", editStore);
+
+router.delete("/:storeId", deleteStore);
 
 export default router;
