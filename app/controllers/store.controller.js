@@ -61,8 +61,14 @@ export const getStoreById = catchAsync(async (req, res, next) => {
 export const getStores = catchAsync(async (req, res, next) => {
   const search = req.query.search;
 
-  // Nếu có tham số search, thêm điều kiện tìm kiếm theo tên
-  const query = search ? { name: { $regex: new RegExp(search, "i") } } : {};
+  const query = {};
+
+  if (search) {
+    query["$or"] = [
+      { name: { $regex: new RegExp(search, "i") } },
+      { address: { $regex: new RegExp(search, "i") } },
+    ];
+  }
 
   const stores = await StoreModel.find(query).populate("owner");
 
@@ -178,6 +184,8 @@ export const deleteStore = catchAsync(async (req, res, next) => {
   }
 
   await store.deleteOne();
+
+  await reviewModel.deleteMany({ store: store._id });
 
   res.status(200).json({
     message: "Xoá cửa hàng thành công",

@@ -4,7 +4,7 @@ import { catchAsync } from "../middlewares/catchAsyncError.js";
 import path from "path";
 import fs from "fs";
 import userModel from "../models/user.model.js";
-import mongoose from "mongoose";
+import commentModel from "../models/comment.model.js";
 import storeModel from "../models/store.model.js";
 import reviewModel from "../models/review.model.js";
 
@@ -224,7 +224,7 @@ export const deleteReview = catchAsync(async (req, res, next) => {
     return next(new ErrorHandler("Không tìm thấy địa điểm này", 404));
   }
 
-  await review.deleteOne();
+  await review.remove();
 
   res.status(200).json({
     message: "Xoá bài review thành công",
