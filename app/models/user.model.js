@@ -2,10 +2,11 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { USER_ROLE } from "../constant/index.js";
 
 const userSchema = mongoose.Schema(
   {
-    phone_number: {
+    phoneNumber: {
       type: String,
     },
     password: {
@@ -29,7 +30,8 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      default: "reviewer",
+      enum: Object.values(USER_ROLE),
+      default: USER_ROLE.USER,
     },
     dateOfBirth: {
       type: Date,

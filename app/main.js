@@ -4,13 +4,13 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { handleError } from "./middlewares/errors.js";
-import routes from "./routers/index.js"
+import routes from "./routers/index.js";
 
 const app = express();
 dotenv.config();
 
 // dùng helmet để bảo vệ thông tin
-app.use(express.static('app/public'))
+app.use(express.static("app/public"));
 // middleware
 app.use(
   express.urlencoded({
@@ -39,12 +39,26 @@ app.use(routes);
 // xử lý lỗi err cho controllers
 app.use(handleError);
 
+const options = {
+  serverSelectionTimeoutMS: 5000,
+  autoIndex: false,
+  maxPoolSize: 10,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  family: 4,
+};
+
 mongoose
-  .connect(process.env.MONGOOSE_URL,)
+  .connect(
+    process.env.MONGOOSE_URL,
+    options
+  )
   .then(() =>
     app.listen(process.env.PORT || 8080, () => {
       console.log(
-        `you are listening on port ${process.env.PORT || 8080} and connect mongodb success!`
+        `you are listening on port ${
+          process.env.PORT || 8080
+        } and connect mongodb success!`
       );
     })
   )
