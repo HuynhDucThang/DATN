@@ -13,6 +13,9 @@ const contractSchema = new mongoose.Schema({
     totalMember: Number,
     totalPrice: Number,
   },
+  status: {
+    type: String,
+  },
   content: String,
   created_at: {
     type: Date,

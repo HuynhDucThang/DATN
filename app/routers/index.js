@@ -14,7 +14,7 @@ router.use("/api/users", userRouter);
 router.use("/api/apartment", apartmentRouter);
 router.use("/api/apartment-tag", apartmentTagRoute);
 router.use("/api/apartment-amenity", apartmentAmenityRoute);
-router.use("/api/comments", commentRoute);
+router.use("/api/comment", commentRoute);
 router.use("/api/contract", contractRoute);
 router.use("/api/notification", notificationRoute);
 
