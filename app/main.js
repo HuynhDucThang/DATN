@@ -5,6 +5,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { handleError } from "./middlewares/errors.js";
 import routes from "./routers/index.js";
+import webhookRoute from "./routers/webhook.route.js";
+
 
 const app = express();
 dotenv.config();
@@ -18,13 +20,14 @@ app.use(
     limit: "50mb",
   })
 );
-
+app.use('', express.raw({ type: 'application/json' }), webhookRoute)
 app.use(
   express.json({
     extended: true,
     limit: "50mb",
   })
 );
+
 
 app.use(cors());
 
