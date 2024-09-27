@@ -11,7 +11,10 @@ export const createApartment = catchAsync(async (req, res, next) => {
   const body = req.body;
   let images = [];
 
-  const newApartment = await ApartmentModel.create(body);
+  const newApartment = await ApartmentModel.create({
+    ...body,
+    owner: req.userId.id,
+  });
   const apartmentDirectory = path.join(
     "app",
     "public",
@@ -62,10 +65,9 @@ export const createApartment = catchAsync(async (req, res, next) => {
 export const getApartmentDetail = catchAsync(async (req, res, next) => {
   const apartmentId = req.params.apartmentId;
 
-  const [apartment, comments] = await Promise.all([
-    ApartmentModel.findById(apartmentId).lean(),
-    CommentModel.find({ apartment: apartmentId }).sort(-1).lean(),
-  ]);
+  const foundApartment = await ApartmentModel.findById(apartmentId)
+    .populate("owner amentities")
+    .lean();
 
   if (!foundApartment) {
     return next(new ErrorHandler("Căn hộ không tồn tại", 400));
@@ -73,17 +75,12 @@ export const getApartmentDetail = catchAsync(async (req, res, next) => {
 
   return res.status(200).json({
     message: "Thành công",
-    data: {
-      apartment,
-      comments,
-    },
+    payload: foundApartment,
   });
 });
 
 export const getApartments = catchAsync(async (req, res, next) => {
   const tagIds = req.query.tag ?? [];
-  console.log("req.query.isApproved : ", req.query.isApproved);
-
   const query = {};
 
   if (req.query.isApproved !== undefined)
@@ -94,13 +91,13 @@ export const getApartments = catchAsync(async (req, res, next) => {
       $in: tagIds,
     };
 
-  const apartment = await ApartmentModel.find(query).populate("owner").lean();
+  const apartment = await ApartmentModel.find(query)
+    .populate("owner rating")
+    .lean();
 
   res.status(200).json({
     message: "tìm kiếm cửa hàng thành công",
-    data: {
-      apartment,
-    },
+    payload: apartment,
   });
 });
 

@@ -4,7 +4,7 @@ import { isUser } from "../middlewares/authentications.js";
 
 const router = express.Router();
 
-router.get("/", isUser, CommentController.getCommentByapartmentId);
+router.get("/", CommentController.getCommentByapartmentId);
 router.post("/:apartmentId", isUser, CommentController.createComment);
 
 export default router;

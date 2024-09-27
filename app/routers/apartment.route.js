@@ -26,12 +26,9 @@ router.post(
   upload.array("images", 10),
   ApartmentController.createApartment
 );
-router.get("/:apartmentId", isUser, ApartmentController.getApartmentDetail);
-router.get("/", isUser, ApartmentController.getApartments);
-router.get(
-  "/:apartmentId/:imageName",
-  ApartmentController.getImageApartment
-);
+router.get("/:apartmentId", ApartmentController.getApartmentDetail);
+router.get("/", ApartmentController.getApartments);
+router.get("/:apartmentId/:imageName", ApartmentController.getImageApartment);
 
 router.patch("/:apartmentId", isUser, ApartmentController.editStore);
 

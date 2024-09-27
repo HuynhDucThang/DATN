@@ -31,10 +31,9 @@ const upload = multer({
 const router = express.Router();
 
 router.get("/icon/:icon", ApartmentAmenityController.getIconApartmentAmenity);
-router.get("/", isUser, ApartmentAmenityController.getapartmentAmentitys);
+router.get("/", ApartmentAmenityController.getapartmentAmentitys);
 router.post(
   "/",
-  isUser,
   upload.single("icon"),
   ApartmentAmenityController.createapartmentAmentity
 );

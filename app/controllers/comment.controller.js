@@ -109,6 +109,6 @@ export const getCommentByapartmentId = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     message: "Lấy thông tin bình luận thành công",
-    data: rootComments,
+    payload: rootComments,
   });
 });
