@@ -31,6 +31,8 @@ const router = express.Router();
 router.post("/upload/:userId", upload.single("avatar"), uploadAvatar);
 router.post("/sign-up", register);
 router.post("/sign-in", login);
+router.put("/verify-user", login);
+
 router.get("/me", isUser, getCurrentUser);
 router.get("/:userId", getCurrentUserById);
 router.get("/avatar/:userId", getAvatar);

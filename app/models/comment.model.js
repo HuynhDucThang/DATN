@@ -5,7 +5,7 @@ const commentSchema = new mongoose.Schema({
   apartment: { type: mongoose.Schema.Types.ObjectId, ref: "Apartment" },
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   content: String,
-  raing: {
+  rating: {
     cleanliness: { type: Number, required: true, default: 0 },
     accuracy: { type: Number, required: true, default: 0 },
     check_in: { type: Number, required: true, default: 0 },

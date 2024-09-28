@@ -59,10 +59,11 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
 });
 
 // https://docs.stripe.com/billing/subscriptions/webhooks#:~:text=Stripe%20sends%20notifications%20to%20your%20app%20using%20webhooks.
-// stripe listen --forward-to localhost:4000/webhook-stripe
+// stripe listen --forward-to localhost:4000/webhook/webhook-stripe
 export const createContract = catchAsync(async (req, res, next) => {
   let event = req.body;
-
+  console.log("event : ", event);
+  
   if (endpointSecret) {
     const signature = req.headers["stripe-signature"];
 
