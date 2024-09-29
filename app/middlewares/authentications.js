@@ -2,8 +2,6 @@ import ErrorHandler from "../utils/errorHandle.js";
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
-  console.log(req.headers);
-
   const bearer = req.headers.authorization.split(" ");
   const token = bearer?.[1];
 

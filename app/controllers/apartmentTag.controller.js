@@ -7,7 +7,7 @@ import fs from "fs";
 export const createApartmentTag = catchAsync(async (req, res, next) => {
   const body = req.body;
 
-  const fileUrl = `${req.protocol}://${req.get("host")}/apartment-tag/icon/${
+  const fileUrl = `${req.protocol}://${req.get("host")}/api/apartment-tag/icon/${
     req.file.filename
   }`;
 

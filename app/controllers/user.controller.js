@@ -42,7 +42,11 @@ export const login = catchAsync(async (req, res, next) => {
   const user = await UserModel.findOne({ email }).select("+password");
 
   if (!user) {
-    return next(new ErrorHandler("Wrong Credential", 401));
+    return next(new ErrorHandler("Wrong Credential", 400));
+  }
+
+  if (user.verifyCode) {
+    return next(new ErrorHandler("Please, check email to verify user", 400));
   }
 
   const checkPassword = await user.comparePassword(password);
@@ -159,12 +163,14 @@ export const verifyAccount = catchAsync(async (req, res, next) => {
   const userId = req.query.id;
   const code = req.query.code;
 
-  const foundUser = await UserModel.findById(new mongoose.Types.ObjectId(userId));
+  const foundUser = await UserModel.findById(
+    new mongoose.Types.ObjectId(userId)
+  );
 
   if (!foundUser) {
     return next(new ErrorHandler("Không tìm thấy người dùng", 400));
   }
-  
+
   if (!foundUser.verifyCode) {
     return next(new ErrorHandler("Người dùng đã xác thực", 400));
   }
