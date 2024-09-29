@@ -4,6 +4,8 @@ import { catchAsync } from "../middlewares/catchAsyncError.js";
 import { sendCookies } from "../utils/sendCookies.js";
 import path from "path";
 import fs from "fs";
+import { sendVerificationEmail } from "../utils/semdMail.js";
+import mongoose from "mongoose";
 
 export const register = catchAsync(async (req, res, next) => {
   const body = req.body;
@@ -13,7 +15,17 @@ export const register = catchAsync(async (req, res, next) => {
     return next(new ErrorHandler("User is exist", 400));
   }
 
-  const newUser = await UserModel.create({ ...body, is_verify: true });
+  const generateCode = Math.floor(100000 + Math.random() * 900000);
+
+  const newUser = await UserModel.create({ ...body, verifyCode: generateCode });
+
+  sendVerificationEmail(
+    newUser.email,
+    newUser._id,
+    generateCode,
+    "Verify your account",
+    "verifyUser"
+  );
 
   sendCookies(newUser, 201, res);
 });
@@ -138,7 +150,34 @@ export const getAvatar = catchAsync(async (req, res) => {
     }
 
     // Trả về ảnh dưới dạng binary
-    res.writeHead(200, { "Content-Type": "image/png" }); // Điều chỉnh kiểu ảnh tương ứng với loại ảnh bạn đang sử dụng
+    res.writeHead(200, { "Content-Type": "image/png" });
     res.end(data, "binary");
+  });
+});
+
+export const verifyAccount = catchAsync(async (req, res, next) => {
+  const userId = req.query.id;
+  const code = req.query.code;
+
+  const foundUser = await UserModel.findById(new mongoose.Types.ObjectId(userId));
+
+  if (!foundUser) {
+    return next(new ErrorHandler("Không tìm thấy người dùng", 400));
+  }
+  
+  if (!foundUser.verifyCode) {
+    return next(new ErrorHandler("Người dùng đã xác thực", 400));
+  }
+
+  if (`${foundUser.verifyCode}` !== `${code}`) {
+    return next(new ErrorHandler("Mã xác thực không đúng", 400));
+  }
+
+  foundUser.verifyCode = null;
+  await foundUser.save();
+
+  return res.status(200).json({
+    message: "Xác thực thành công",
+    payload: null,
   });
 });

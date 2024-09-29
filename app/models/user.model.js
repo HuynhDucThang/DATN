@@ -39,9 +39,8 @@ const userSchema = mongoose.Schema(
     address: {
       type: String,
     },
-    verify_otp: {
-      type: Boolean,
-      default: false,
+    verifyCode: {
+      type: String,
     },
 
     refreshPasswordToken: String,

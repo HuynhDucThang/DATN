@@ -6,6 +6,7 @@ import {
   uploadAvatar,
   getAvatar,
   getCurrentUserById,
+  verifyAccount,
 } from "../controllers/user.controller.js";
 import { isUser } from "../middlewares/authentications.js";
 import multer from "multer";
@@ -31,7 +32,7 @@ const router = express.Router();
 router.post("/upload/:userId", upload.single("avatar"), uploadAvatar);
 router.post("/sign-up", register);
 router.post("/sign-in", login);
-router.put("/verify-user", login);
+router.put("/verify-account", verifyAccount);
 
 router.get("/me", isUser, getCurrentUser);
 router.get("/:userId", getCurrentUserById);
