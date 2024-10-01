@@ -48,7 +48,7 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
       contractId: contract._id.toString(),
     },
     mode: "payment",
-    success_url: `${process.env.FRONT_END_DOMAIN}`,
+    success_url: `${process.env.FRONT_END_DOMAIN}/apartment/${apartmentId}`,
     cancel_url: `${process.env.FRONT_END_DOMAIN}`,
   });
 
@@ -63,7 +63,7 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
 export const createContract = catchAsync(async (req, res, next) => {
   let event = req.body;
   console.log("event : ", event);
-  
+
   if (endpointSecret) {
     const signature = req.headers["stripe-signature"];
 
@@ -94,9 +94,12 @@ export const createContract = catchAsync(async (req, res, next) => {
 });
 
 export const getContracts = catchAsync(async (req, res) => {
-  const userId = req.userId.id;
+  const apartmentId = req.query.apartmentId;
+  console.log("apartmentId: ", apartmentId);
+  
+
   const contract = await ContractModel.find({
-    payer: userId,
+    apartment: apartmentId,
   }).lean();
 
   res.status(200).json({

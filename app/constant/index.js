@@ -4,7 +4,7 @@ export const USER_ROLE = {
 };
 
 export const APARTMENT_TYPE = {
-  STUDIO: "Căn hộ Studio",
-  HOUSE: "Nhà",
-  CONDO: "Biệt Thự",
+  STUDIO: "STUDIO",
+  HOUSE: "HOUSE",
+  CONDO: "CONDO",
 };

@@ -8,7 +8,7 @@ router.post(
   "/webhook",
   ContractController.createContract
 );
-router.get("/", isUser, ContractController.getContracts);
+router.get("/", ContractController.getContracts);
 router.post("/:apartmentId", isUser, ContractController.createSessionContract);
 
 export default router;

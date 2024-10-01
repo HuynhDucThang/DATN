@@ -11,7 +11,10 @@ const apartmentSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: "ApartmentAmentity" },
     ],
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    pricePerNight: String,
+    pricePerNight: {
+      type: String,
+      required: true,
+    },
     address: String,
     rating: {
       cleanliness: { type: Number, required: true, default: 0 },
@@ -49,9 +52,7 @@ const apartmentSchema = new mongoose.Schema(
       default: false,
     },
   },
-  {
-    timestamp: true,
-  }
+  { timestamps: true }
 );
 
 export default mongoose.model("Apartment", apartmentSchema);

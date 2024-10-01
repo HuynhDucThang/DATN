@@ -91,6 +91,20 @@ export const getApartments = catchAsync(async (req, res, next) => {
       $in: tagIds,
     };
 
+  if (req.query.lowest_price && req.query.hightest_price) {
+    const lowestPrice = parseFloat(req.query.lowest_price);
+    const highestPrice = parseFloat(req.query.hightest_price);
+
+    if (!isNaN(lowestPrice) && !isNaN(highestPrice)) {
+      query["$expr"] = {
+        $and: [
+          { $gte: [{ $toDouble: "$pricePerNight" }, lowestPrice] },
+          { $lte: [{ $toDouble: "$pricePerNight" }, highestPrice] },
+        ],
+      };
+    }
+  }
+
   const apartment = await ApartmentModel.find(query)
     .populate("owner rating")
     .lean();
