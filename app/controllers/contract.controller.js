@@ -25,6 +25,7 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
       apartment: apartmentId,
       payer: userId,
       status: "PENDING",
+      ...req.body
     });
     await contract.save();
   }
@@ -95,8 +96,6 @@ export const createContract = catchAsync(async (req, res, next) => {
 
 export const getContracts = catchAsync(async (req, res) => {
   const apartmentId = req.query.apartmentId;
-  console.log("apartmentId: ", apartmentId);
-  
 
   const contract = await ContractModel.find({
     apartment: apartmentId,
