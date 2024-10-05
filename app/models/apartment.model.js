@@ -29,6 +29,10 @@ const apartmentSchema = new mongoose.Schema(
       type: String,
       enum: Object.values(APARTMENT_TYPE),
     },
+    totalComments: {
+      type: Number,
+      default: 0,
+    },
     rooms: {
       livingRoom: {
         type: Number,

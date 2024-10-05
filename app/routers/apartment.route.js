@@ -1,6 +1,5 @@
 import express from "express";
 import * as ApartmentController from "../controllers/apartment.controller.js";
-
 import multer from "multer";
 import { createDirectoryIfNotExists } from "../utils/common.js";
 
@@ -30,7 +29,7 @@ router.get("/:apartmentId", ApartmentController.getApartmentDetail);
 router.get("/", ApartmentController.getApartments);
 router.get("/:apartmentId/:imageName", ApartmentController.getImageApartment);
 
-router.patch("/:apartmentId", isUser, ApartmentController.editStore);
+router.patch("/:apartmentId", isUser, ApartmentController.editApartment);
 
 router.delete("/:apartmentId", isUser, ApartmentController.deleteApartment);
 

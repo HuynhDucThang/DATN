@@ -6,21 +6,33 @@ import mongoose from "mongoose";
 
 export const createComment = catchAsync(async (req, res, next) => {
   const apartmentId = req.params.apartmentId;
-  const foundApartment = await ApartmentModel.findById(apartmentId).lean();
+
+  const foundApartment = await ApartmentModel.findById(apartmentId);
 
   if (!foundApartment) {
     return next(new ErrorHandler("Không tìm thấy căn hộ", 404));
   }
+
+  foundApartment.rating.value += req.body.rating.value;
+  foundApartment.rating.location += req.body.rating.location;
+  foundApartment.rating.accuracy += req.body.rating.accuracy;
+  foundApartment.rating.check_in += req.body.rating.check_in;
+  foundApartment.rating.totalScope += req.body.rating.totalScope;
+  foundApartment.rating.cleanliness += req.body.rating.cleanliness;
+  foundApartment.rating.communication += req.body.rating.communication;
+
+  foundApartment.totalComments += 1;
 
   const bodyCreate = {
     ...req.body,
     apartment: apartmentId,
     author: req.userId.id,
   };
-  const newComment = new CommentModel(bodyCreate);
-  await newComment.save();
 
-  res.status(200).json({
+  const newComment = new CommentModel(bodyCreate);
+  await Promise.all([newComment.save(), foundApartment.save()]);
+
+  return res.status(200).json({
     message: "Tạo bình luận thành công",
     data: newComment,
   });
@@ -35,8 +47,8 @@ export const getCommentByapartmentId = catchAsync(async (req, res, next) => {
         apartment: apartmentId,
         $or: [
           { parentComment: { $eq: null } },
-          { parentComment: { $exists: false } }
-        ]
+          { parentComment: { $exists: false } },
+        ],
       },
     },
     {
@@ -61,13 +73,13 @@ export const getCommentByapartmentId = catchAsync(async (req, res, next) => {
     {
       $lookup: {
         from: "users",
-        let: { childrenAuthors: "$children.author" },  // Truyền danh sách author của các children
+        let: { childrenAuthors: "$children.author" }, // Truyền danh sách author của các children
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$childrenAuthors"] }  // So sánh _id với danh sách author
-            }
-          }
+              $expr: { $in: ["$_id", "$$childrenAuthors"] }, // So sánh _id với danh sách author
+            },
+          },
         ],
         as: "childrenAuthorDetails",
       },
@@ -105,7 +117,6 @@ export const getCommentByapartmentId = catchAsync(async (req, res, next) => {
       $sort: { created_at: -1 },
     },
   ]);
-  
 
   res.status(200).json({
     message: "Lấy thông tin bình luận thành công",

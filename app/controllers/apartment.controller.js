@@ -73,6 +73,32 @@ export const getApartmentDetail = catchAsync(async (req, res, next) => {
     return next(new ErrorHandler("Căn hộ không tồn tại", 400));
   }
 
+  if (foundApartment.totalComments) {
+    foundApartment.rating = {
+      check_in: Math.floor(
+        foundApartment.rating.check_in / foundApartment.totalComments
+      ),
+      cleanliness: Math.floor(
+        foundApartment.rating.cleanliness / foundApartment.totalComments
+      ),
+      communication: Math.floor(
+        foundApartment.rating.communication / foundApartment.totalComments
+      ),
+      accuracy: Math.floor(
+        foundApartment.rating.accuracy / foundApartment.totalComments
+      ),
+      location: Math.floor(
+        foundApartment.rating.location / foundApartment.totalComments
+      ),
+      value: Math.floor(
+        foundApartment.rating.value / foundApartment.totalComments
+      ),
+      totalScope: Math.floor(
+        foundApartment.rating.totalScope / foundApartment.totalComments
+      ),
+    };
+  }
+
   return res.status(200).json({
     message: "Thành công",
     payload: foundApartment,
@@ -155,7 +181,7 @@ export const getImageApartment = catchAsync(async (req, res) => {
   });
 });
 
-export const editStore = catchAsync(async (req, res, next) => {
+export const editApartment = catchAsync(async (req, res, next) => {
   const apartmentId = req.params.apartmentId;
 
   const apartment = await ApartmentModel.findById(apartmentId);
@@ -170,11 +196,15 @@ export const editStore = catchAsync(async (req, res, next) => {
     (key) => updateData[key] === undefined && delete updateData[key]
   );
 
-  const updatedStore = await store.apartment(updateData);
+  const updatedApartment = await ApartmentModel.findByIdAndUpdate(
+    apartmentId,
+    { $set: updateData },
+    { new: true, runValidators: true }
+  );
 
   res.status(200).json({
     message: "Chỉnh sửa thành công",
-    data: updatedStore,
+    payload: updatedApartment,
   });
 });
 
@@ -189,8 +219,8 @@ export const deleteApartment = catchAsync(async (req, res, next) => {
 
   await Promise.all([CommentModel.deleteMany({ apartment: apartment._id })]);
 
-  res.status(200).json({
+  return res.status(200).json({
     message: "Xoá căn hộ thành công",
-    data: null,
+    payload: null,
   });
 });
