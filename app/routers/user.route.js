@@ -7,6 +7,7 @@ import {
   getAvatar,
   getCurrentUserById,
   verifyAccount,
+  getUsers,
 } from "../controllers/user.controller.js";
 import { isUser } from "../middlewares/authentications.js";
 import multer from "multer";
@@ -37,5 +38,6 @@ router.put("/verify-account", verifyAccount);
 router.get("/me", isUser, getCurrentUser);
 router.get("/:userId", getCurrentUserById);
 router.get("/avatar/:userId", getAvatar);
+router.get("/", isUser, getUsers);
 
 export default router;

@@ -7,6 +7,7 @@ import apartmentAmenityRoute from "./apartmentAmenity.route.js";
 import contractRoute from "./contract.route.js";
 import commentRoute from "./comment.route.js";
 import notificationRoute from "./notification.route.js";
+import statisticsRoute from "./statistic.route.js";
 
 const router = express.Router();
 
@@ -17,5 +18,6 @@ router.use("/api/apartment-amenity", apartmentAmenityRoute);
 router.use("/api/comment", commentRoute);
 router.use("/api/contract", contractRoute);
 router.use("/api/notification", notificationRoute);
+router.use("/api/statistic", statisticsRoute);
 
 export default router;

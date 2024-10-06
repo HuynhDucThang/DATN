@@ -38,7 +38,6 @@ export const login = catchAsync(async (req, res, next) => {
       new ErrorHandler("Please, enter your email number and password", 400)
     );
   }
-
   const user = await UserModel.findOne({ email }).select("+password");
 
   if (!user) {
@@ -112,6 +111,38 @@ export const getCurrentUserById = catchAsync(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     data: foundUser,
+  });
+});
+
+export const getUsers = catchAsync(async (req, res) => {
+  const { page = 1, limit = 10, q: searchQuery } = req.query;
+  const pageNumber = Math.max(parseInt(page, 10), 1);
+  const limitNumber = Math.max(parseInt(limit, 10), 6);
+
+  const condition = {};
+
+  if (searchQuery) {
+    condition.$or = [
+      { name: { $regex: searchQuery, $options: "i" } },
+      { email: { $regex: searchQuery, $options: "i" } },
+    ];
+  }
+
+  const skip = (pageNumber - 1) * limitNumber;
+
+  const [users, totalUsers] = await Promise.all([
+    UserModel.find(condition).skip(skip).limit(limitNumber).lean(),
+    UserModel.countDocuments(condition),
+  ]);
+
+  return res.status(200).json({
+    message: "Users fetched successfully",
+    data: {
+      users,
+      totalPages: Math.ceil(totalUsers / limitNumber),
+      currentPage: pageNumber,
+      totalUsers,
+    },
   });
 });
 
