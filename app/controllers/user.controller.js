@@ -110,7 +110,7 @@ export const getCurrentUserById = catchAsync(async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    data: foundUser,
+    payload: foundUser,
   });
 });
 
@@ -165,13 +165,15 @@ export const uploadAvatar = catchAsync(async (req, res, next) => {
   if (!foundUser) {
     return next(new ErrorHandler("Không tìm thấy bài riviu", 404));
   }
-  foundUser.avatar = `${req.file.filename}`;
+  foundUser.avatar = `${req.protocol}://${req.get("host")}/api/users/avatar/${
+    req.file.filename
+  }`;
 
   await foundUser.save();
 
   return res.status(200).json({
     message: "Tải ảnh thành công",
-    data: `${req.file.filename}`,
+    payload: foundUser.avatar,
   });
 });
 
@@ -215,6 +217,52 @@ export const verifyAccount = catchAsync(async (req, res, next) => {
 
   return res.status(200).json({
     message: "Xác thực thành công",
+    payload: null,
+  });
+});
+
+export const updateAccount = catchAsync(async (req, res, next) => {
+  const userId = req.params.userId;
+  const body = req.body;
+
+  const foundUser = await UserModel.findById(
+    new mongoose.Types.ObjectId(userId)
+  );
+
+  if (!foundUser) {
+    return next(new ErrorHandler("Không tìm thấy người dùng", 400));
+  }
+
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    userId,
+    { $set: body },
+    { new: true }
+  );
+
+  if (!updatedUser) {
+    return next(new ErrorHandler("Cập nhật thông tin không thành công", 500));
+  }
+
+  return res.status(200).json({
+    message: "Cập nhật thành công",
+    payload: updatedUser,
+  });
+});
+
+export const deleteAccount = catchAsync(async (req, res, next) => {
+  const userId = req.params.userId;
+  const foundUser = await UserModel.findById(
+    new mongoose.Types.ObjectId(userId)
+  );
+
+  if (!foundUser) {
+    return next(new ErrorHandler("Không tìm thấy người dùng", 400));
+  }
+
+  await UserModel.findByIdAndDelete(userId);
+
+  return res.status(200).json({
+    message: "Xóa thành công",
     payload: null,
   });
 });
