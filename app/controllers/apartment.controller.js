@@ -10,7 +10,7 @@ import { createDirectoryIfNotExists } from "../utils/common.js";
 export const createApartment = catchAsync(async (req, res, next) => {
   const body = req.body;
   let images = [];
-
+  
   const newApartment = await ApartmentModel.create({
     ...body,
     owner: req.userId.id,
@@ -108,6 +108,8 @@ export const getApartmentDetail = catchAsync(async (req, res, next) => {
 export const getApartments = catchAsync(async (req, res, next) => {
   const tagIds = req.query.tag ?? [];
   const query = {};
+
+  if (req.query.q) query["name"] = { $regex: req.query.q, $options: "i" };
 
   if (req.query.isApproved !== undefined)
     query["isApproved"] = req.query.isApproved;

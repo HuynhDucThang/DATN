@@ -75,3 +75,5 @@ build/
 *.njsproj
 *.sln
 *.sw?
+
+public
