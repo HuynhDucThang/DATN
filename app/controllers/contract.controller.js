@@ -35,7 +35,7 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
       {
         price_data: {
           currency: "vnd",
-          unit_amount: 100000,
+          unit_amount: req.body.information.totalPrice,
           product_data: {
             name: "Thuê căn hộ qua AirBNB",
           },
@@ -63,7 +63,6 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
 // stripe listen --forward-to localhost:4000/webhook/webhook-stripe
 export const createContract = catchAsync(async (req, res, next) => {
   let event = req.body;
-  console.log("event : ", event);
 
   if (endpointSecret) {
     const signature = req.headers["stripe-signature"];
@@ -95,19 +94,27 @@ export const createContract = catchAsync(async (req, res, next) => {
 });
 
 export const getContracts = catchAsync(async (req, res) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = page ? parseInt(req.query.limit) || 6 : 0;
+  const skip = page > 0 ? (page - 1) * limit : 0;
+
   const condition = {};
 
   if (req.query.apartmentId) {
-    condition[apartmentId] = req.query.apartmentId;
+    condition["apartment"] = req.query.apartmentId;
   }
-  
-  const contract = await ContractModel.find(condition)
-    .populate("payer")
-    .populate("apartment")
-    .lean();
 
-  res.status(200).json({
-    message: "tìm kiếm hợp đồng thành công",
+  let contractQuery = ContractModel.find(condition)
+    .populate("payer")
+    .populate("apartment");
+
+  if (page) {
+    contractQuery = contractQuery.skip(skip).limit(limit);
+  }
+
+  const contract = await contractQuery.lean();
+  return res.status(200).json({
+    message: "Tìm kiếm hợp đồng thành công",
     data: contract,
   });
 });

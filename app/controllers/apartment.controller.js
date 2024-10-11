@@ -10,7 +10,7 @@ import { createDirectoryIfNotExists } from "../utils/common.js";
 export const createApartment = catchAsync(async (req, res, next) => {
   const body = req.body;
   let images = [];
-  
+
   const newApartment = await ApartmentModel.create({
     ...body,
     owner: req.userId.id,
@@ -132,11 +132,18 @@ export const getApartments = catchAsync(async (req, res, next) => {
       };
     }
   }
-
-  const apartment = await ApartmentModel.find(query)
-    .populate("owner rating")
-    .lean();
-
+  const page = parseInt(req.query.page) || 0;
+  const limit = page ? parseInt(req.query.limit) || 6 : 0;  
+  const skip = page > 0 ? (page - 1) * limit : 0;
+  
+  let apartmentQuery = ApartmentModel.find(query)
+    .populate("owner rating");
+  
+  if (page) {
+    apartmentQuery = apartmentQuery.skip(skip).limit(limit);
+  }
+  
+  const apartment = await apartmentQuery.lean();
   res.status(200).json({
     message: "tìm kiếm cửa hàng thành công",
     payload: apartment,
