@@ -42,6 +42,10 @@ const userSchema = mongoose.Schema(
     verifyCode: {
       type: String,
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
 
     refreshPasswordToken: String,
     refreshPasswordExpire: Date,

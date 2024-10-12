@@ -5,5 +5,6 @@ import { isUser } from "../middlewares/authentications.js";
 const router = express.Router();
 
 router.get("/overview", isUser, StatisticController.getOverviewStatistics);
+router.get("/chart", isUser, StatisticController.getChartStatistics);
 
 export default router;
