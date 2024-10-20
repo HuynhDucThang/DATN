@@ -18,7 +18,31 @@ const templates = {
           <a href="${verificationLink}">Verify Email</a>
           <p>If you didn't register, please ignore this email.</p>
         `,
+  paymentSuccess: () => `
+        <h1>Payment</h1>
+        <p>Thank you for payment. Have a good day</p>
+`,
   // You can add more templates here if needed
+};
+
+/**
+ * @param {string} to
+ * @param {string} subject
+ */
+export const sendPaymentSuccessMail = (to, subject) => {
+  const mailOptions = {
+    to,
+    subject: subject,
+    html: templates.paymentSuccess(),
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log("Error sending email:", error);
+    } else {
+      console.log("Email sent:", info.response);
+    }
+  });
 };
 
 /**

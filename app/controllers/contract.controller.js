@@ -2,6 +2,11 @@ import ContractModel from "../models/contract.model.js";
 import { catchAsync } from "../middlewares/catchAsyncError.js";
 import Stripe from "stripe";
 import ErrorHandler from "../utils/errorHandle.js";
+import UserModel from "../models/user.model.js";
+import {
+  sendPaymentSuccessMail,
+  sendVerificationEmail,
+} from "../utils/semdMail.js";
 
 const stripe = Stripe(
   "sk_test_51PxtsV06UBHk5x7w9SXBYtCaPt7jIPPhDb5N6Xta9dI8zI3dZBcfhjYC06K6nTwgtoUxVzHTpSrwxb3HAD4bCwJh00l3dt5gYs"
@@ -83,6 +88,16 @@ export const createContract = catchAsync(async (req, res, next) => {
 
   if (["checkout.session.completed", "invoice.paid"].includes(event.type)) {
     const metadata = event.data.object.metadata;
+    const userId = event.data.object.metadata.userId;
+
+    const foundUser = await UserModel.findById(userId).lean();
+
+    if (!foundUser) {
+      return next(new ErrorHandler("Không tìm thấy người dùng", 404));
+    }
+
+    sendPaymentSuccessMail(foundUser.email, "Payment success");
+
     await ContractModel.findByIdAndUpdate(metadata.contractId, {
       $set: {
         status: "COMPLETED",

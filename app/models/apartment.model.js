@@ -33,6 +33,10 @@ const apartmentSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    totalPeople: {
+      type: Number,
+      default: 3,
+    },
     rooms: {
       livingRoom: {
         type: Number,
