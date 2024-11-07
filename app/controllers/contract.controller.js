@@ -112,11 +112,16 @@ export const getContracts = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page) || 0;
   const limit = page ? parseInt(req.query.limit) || 6 : 0;
   const skip = page > 0 ? (page - 1) * limit : 0;
+  const userId = req.query.userId;
 
   const condition = {};
 
   if (req.query.apartmentId) {
     condition["apartment"] = req.query.apartmentId;
+  }
+
+  if (userId) {
+    condition["payer"] = userId;
   }
 
   let contractQuery = ContractModel.find(condition)

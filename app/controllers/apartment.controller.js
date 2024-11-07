@@ -100,7 +100,7 @@ export const getApartmentDetail = catchAsync(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    message: "Thành công",
+    message: "Thành công", 
     payload: foundApartment,
   });
 });

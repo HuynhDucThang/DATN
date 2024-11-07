@@ -102,6 +102,7 @@ export const checkPhoneNumber = catchAsync(async (req, res, next) => {
 
 export const getCurrentUserById = catchAsync(async (req, res, next) => {
   const userId = req.params.userId;
+  
   const foundUser = await UserModel.findById(userId).lean();
 
   if (!foundUser) {
@@ -232,7 +233,7 @@ export const updateAccount = catchAsync(async (req, res, next) => {
   if (!foundUser) {
     return next(new ErrorHandler("Không tìm thấy người dùng", 400));
   }
-
+  
   const updatedUser = await UserModel.findByIdAndUpdate(
     userId,
     { $set: body },

@@ -39,7 +39,7 @@ router.put("/verify-account", verifyAccount);
 router.patch("/update/:userId", updateAccount);
 
 router.get("/me", isUser, getCurrentUser);
-router.get("/:userId", getCurrentUserById);
+router.get("/:userId", isUser, getCurrentUserById);
 router.get("/avatar/:userId", getAvatar);
 router.get("/", isUser, getUsers);
 router.delete("/:userId", deleteAccount);
