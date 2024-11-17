@@ -100,7 +100,7 @@ export const getApartmentDetail = catchAsync(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    message: "Thành công", 
+    message: "Thành công",
     payload: foundApartment,
   });
 });
@@ -133,20 +133,24 @@ export const getApartments = catchAsync(async (req, res, next) => {
     }
   }
   const page = parseInt(req.query.page) || 0;
-  const limit = page ? parseInt(req.query.limit) || 6 : 0;  
+  const limit = page ? parseInt(req.query.limit) || 6 : 0;
   const skip = page > 0 ? (page - 1) * limit : 0;
-  
-  let apartmentQuery = ApartmentModel.find(query)
-    .populate("owner rating");
-  
+
+  let apartmentQuery = ApartmentModel.find(query).populate("owner rating");
+
   if (page) {
     apartmentQuery = apartmentQuery.skip(skip).limit(limit);
   }
-  
-  const apartment = await apartmentQuery.lean();
+
+  const [apartment, total] = await Promise.all([
+    apartmentQuery.lean(), 
+    ApartmentModel.countDocuments(query), 
+  ]);
+
   res.status(200).json({
     message: "tìm kiếm cửa hàng thành công",
     payload: apartment,
+    total: total,
   });
 });
 

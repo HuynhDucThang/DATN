@@ -48,6 +48,7 @@ const options = {
   socketTimeoutMS: 45000,
   family: 4,
 };
+console.log(process.env.MONGOOSE_URL);
 
 mongoose
   .connect(process.env.MONGOOSE_URL, options)

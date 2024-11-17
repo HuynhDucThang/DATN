@@ -24,6 +24,7 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
     payer: userId,
     status: "PENDING",
   });
+  console.log("req.body : ", req.body);
 
   if (!contract) {
     contract = new ContractModel({
@@ -48,6 +49,19 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
         quantity: 1,
       },
     ],
+    // custom_text: {
+    //   shipping_address: {
+    //     message:
+    //       "Please note that we can't guarantee 2-day delivery for PO boxes at this time.",
+    //   },
+    //   submit: {
+    //     message: "We'll email you instructions on how to get started.",
+    //   },
+    //   after_submit: {
+    //     message:
+    //       "Learn more about **your purchase** on our [product page](https://www.stripe.com/).",
+    //   },
+    // },
     metadata: {
       userId,
       apartmentId,
@@ -132,9 +146,14 @@ export const getContracts = catchAsync(async (req, res) => {
     contractQuery = contractQuery.skip(skip).limit(limit);
   }
 
-  const contract = await contractQuery.lean();
+  const [contract, total] = await Promise.all([
+    contractQuery.lean(),
+    ContractModel.countDocuments(),
+  ]);
+
   return res.status(200).json({
     message: "Tìm kiếm hợp đồng thành công",
     data: contract,
+    total,
   });
 });
