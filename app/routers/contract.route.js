@@ -11,6 +11,7 @@ router.post(
 router.get("/", ContractController.getContracts);
 router.post("/:apartmentId", isUser, ContractController.createSessionContract);
 router.post("/:userId/user", isUser, ContractController.createSessionContract);
-
+router.patch("/:contractId", isUser, ContractController.updateContract);
+router.delete("/:contractId", isUser, ContractController.deleteContract);
 
 export default router;

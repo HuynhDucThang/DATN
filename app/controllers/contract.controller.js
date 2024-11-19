@@ -157,3 +157,63 @@ export const getContracts = catchAsync(async (req, res) => {
     total,
   });
 });
+
+export const updateContract = catchAsync(async (req, res) => {
+  const { contractId } = req.params;
+  const updateData = req.body;
+
+  try {
+    const updatedContract = await ContractModel.findByIdAndUpdate(
+      contractId,
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!updatedContract) {
+      res.status(404).json({
+        message: "Hợp đồng không tồn tại",
+        data: null,
+      });
+    }
+
+    res.status(200).json({
+      message: "Cập nhật hợp đồng thành công",
+      data: updatedContract,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Có lỗi xảy ra khi cập nhật hợp đồng",
+      error: error.message,
+    });
+  }
+});
+
+export const deleteContract = catchAsync(async (req, res) => {
+  const { contractId } = req.params;
+  const updateData = req.body;
+
+  try {
+    const updatedContract = await ContractModel.findByIdAndDelete(
+      contractId,
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!updatedContract) {
+      res.status(404).json({
+        message: "Hợp đồng không tồn tại",
+        data: null,
+      });
+    }
+
+    res.status(200).json({
+      message: "xóa hợp đồng thành công",
+      data: null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Có lỗi xảy ra khi xóa hợp đồng",
+      error: error.message,
+    });
+  }
+});
