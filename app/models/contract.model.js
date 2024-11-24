@@ -12,10 +12,15 @@ const contractSchema = new mongoose.Schema({
   information: {
     totalMember: Number,
     totalPrice: Number,
+    pricePerNight: Number,
+    totalDays: Number,
   },
-  isCheckOut: {
+  isCheckIn: {
     type: Boolean,
     default: false,
+  },
+  checkInAt: {
+    type: Date,
   },
   status: {
     type: String,

@@ -77,3 +77,4 @@ build/
 *.sw?
 
 public
+/app/mongo-data

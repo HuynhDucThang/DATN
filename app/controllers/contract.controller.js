@@ -7,6 +7,7 @@ import {
   sendPaymentSuccessMail,
   sendVerificationEmail,
 } from "../utils/semdMail.js";
+import apartmentModel from "../models/apartment.model.js";
 
 const stripe = Stripe(
   "sk_test_51PxtsV06UBHk5x7w9SXBYtCaPt7jIPPhDb5N6Xta9dI8zI3dZBcfhjYC06K6nTwgtoUxVzHTpSrwxb3HAD4bCwJh00l3dt5gYs"
@@ -14,6 +15,19 @@ const stripe = Stripe(
 
 const endpointSecret =
   "whsec_8ff5c8ed5a12207ffbdf3ba48e649e323ce950cde52f946029d21060b551ed66";
+
+export function formatVND(amount) {
+  const numericAmount =
+    typeof amount === "string" ? parseFloat(amount) : amount;
+  if (isNaN(numericAmount)) {
+    return "Invalid";
+  }
+
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(numericAmount);
+}
 
 export const createSessionContract = catchAsync(async (req, res, next) => {
   const apartmentId = req.params.apartmentId;
@@ -23,8 +37,8 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
     apartment: apartmentId,
     payer: userId,
     status: "PENDING",
-  });
-  console.log("req.body : ", req.body);
+  }).populate("apartment");
+  let apartment = contract?.apartment;
 
   if (!contract) {
     contract = new ContractModel({
@@ -33,6 +47,8 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
       status: "PENDING",
       ...req.body,
     });
+    apartment = await apartmentModel.findById(apartmentId);
+
     await contract.save();
   }
 
@@ -41,34 +57,45 @@ export const createSessionContract = catchAsync(async (req, res, next) => {
       {
         price_data: {
           currency: "vnd",
-          unit_amount: req.body.information.totalPrice,
+          unit_amount:
+            req.body.information.pricePerNight * req.body.information.totalDays,
           product_data: {
-            name: "Thuê căn hộ qua AirBNB",
+            name: `Thuê căn hộ qua AirBNB với giá ${formatVND(
+              req.body.information.pricePerNight
+            )}/đêm`,
+            description: `Thuê căn hộ ${apartment.name}, ${req.body.information.totalDays} ngày/đêm tại ${apartment.address} `,
           },
         },
         quantity: 1,
       },
+      {
+        price_data: {
+          currency: "vnd",
+          product_data: {
+            name: "Phí vệ sinh",
+          },
+          unit_amount: 200000,
+        },
+        quantity: 1,
+      },
+      {
+        price_data: {
+          currency: "vnd",
+          product_data: {
+            name: "Phí dịch vụ Airbnb",
+          },
+          unit_amount: 300000,
+        },
+        quantity: 1,
+      },
     ],
-    // custom_text: {
-    //   shipping_address: {
-    //     message:
-    //       "Please note that we can't guarantee 2-day delivery for PO boxes at this time.",
-    //   },
-    //   submit: {
-    //     message: "We'll email you instructions on how to get started.",
-    //   },
-    //   after_submit: {
-    //     message:
-    //       "Learn more about **your purchase** on our [product page](https://www.stripe.com/).",
-    //   },
-    // },
     metadata: {
       userId,
       apartmentId,
       contractId: contract._id.toString(),
     },
     mode: "payment",
-    success_url: `${process.env.FRONT_END_DOMAIN}/apartment/${apartmentId}`,
+    success_url: `${process.env.FRONT_END_DOMAIN}/apartment/${apartmentId}?payment=true`,
     cancel_url: `${process.env.FRONT_END_DOMAIN}`,
   });
 
@@ -163,6 +190,10 @@ export const updateContract = catchAsync(async (req, res) => {
   const updateData = req.body;
 
   try {
+    if (updateData.isCheckIn === true) {
+      updateData.checkInAt = new Date();
+    }
+
     const updatedContract = await ContractModel.findByIdAndUpdate(
       contractId,
       { $set: updateData },
